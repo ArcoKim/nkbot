@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+    <link rel="stylesheet" href="css/style.css">
+    <title>NKBot</title>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="title">North Korea Bot</div>
+        <div class="box">
+            <div class="item">
+                <div class="icon">
+                    <i class="fa fa-user"></i>
+                </div>
+                <div class="msg">
+                    <p>안녕하세요, NKBot입니다! 북한에 대해 궁금한 점이 있다면 물어보세요.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="typing-area">
+            <div class="input-field">
+                <input type="text" placeholder="질문을 입력하세요." id="input" required>
+                <button id="send">Send</button>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    let id = "";
+    const chat = () => {
+        const input = document.getElementById("input");
+        if(input.value.trim().length === 0) return;
+
+        document.getElementsByClassName("box")[0].innerHTML += `
+        <br clear="both">
+        <div class="item right">
+            <div class="msg">
+                <p>${input.value}</p>
+            </div>
+        </div>
+        <br clear="both">
+        <div class="item">
+            <div class="icon">
+                <i class="fa fa-user"></i>
+            </div>
+            <div class="msg">
+                <p>Loading ...</p>
+            </div>
+        </div>
+        `;
+        const box = document.getElementsByClassName('box')[0];
+        box.scrollTop = box.scrollHeight;
+
+        fetch("/api/chat", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                question: input.value,
+                sessionId: id
+            }),
+        })
+        .then((response) => response.json())
+        .then((body) => {
+            document.querySelector("div.box > div:last-child > div.msg > p").textContent = body.answer;
+            id = body.sessionId;
+        });
+        
+        input.value = "";
+    };
+
+    document.getElementById("send").addEventListener("click", chat);
+    document.getElementById("input").addEventListener("keyup", (e) => {
+        if (e.keyCode === 13) {
+            chat();
+        }
+    });
+</script>
+</html>
