@@ -26,7 +26,7 @@ resource "aws_cloudfront_distribution" "main" {
     target_origin_id = aws_s3_bucket.static.id
 
     viewer_protocol_policy = "redirect-to-https"
-    cache_policy_id        = data.aws_cloudfront_cache_policy.cache-api.id
+    cache_policy_id        = data.aws_cloudfront_cache_policy.cache-s3.id
   }
 
   ordered_cache_behavior {
@@ -53,9 +53,9 @@ resource "aws_cloudfront_distribution" "main" {
   }
 }
 
-# data "aws_cloudfront_cache_policy" "cache-s3" {
-#   name = "Managed-CachingOptimized"
-# }
+data "aws_cloudfront_cache_policy" "cache-s3" {
+  name = "Managed-CachingOptimized"
+}
 
 data "aws_cloudfront_cache_policy" "cache-api" {
   name = "Managed-CachingDisabled"
